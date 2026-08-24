@@ -14,7 +14,6 @@ public class LittlePrince extends JPanel implements ActionListener {
     public LittlePrince() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(new Color(245, 243, 238));
-        // 60 FPS
         timer = new Timer(16, this); 
         timer.start();
     }
