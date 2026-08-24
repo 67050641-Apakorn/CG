@@ -1,3 +1,5 @@
+package Assignment1;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -244,7 +246,139 @@ public class LittlePrinceSmoothStory extends JPanel implements ActionListener {
                                  darkInner.getBlue() - 20 < 0 ? 0 : darkInner.getBlue() - 20, 160));
         g2d.fillOval(x + w / 6, y + h / 6, (int)(w * 0.65), (int)(h * 0.65));
     }
+    // ==========================================
+    // ซีนแม่น้ำ: เรือกระดาษลอยน้ำพร้อมโมเดลตัวละครเดิมของคุณ
+    // ==========================================
+    private void drawRiverScene(Graphics2D g2d, double t) {
 
+        // =========================================================
+        // 1. BACKGROUND & WATER GRADIENT
+        // =========================================================
+        GradientPaint water = new GradientPaint(
+                0, 0, new Color(110, 155, 200),
+                0, HEIGHT, new Color(55, 105, 155)
+        );
+        g2d.setPaint(water);
+        g2d.fillRect(0, 0, WIDTH, HEIGHT);
+
+        // เส้นแสงสะท้อนผิวน้ำ
+        for (int i = 0; i < 22; i++) {
+            int yy = 130 + (i * 31) % 440;
+            int xx = (int) ((i * 77 + globalTime * 25) % 700) - 80;
+            int len = 20 + (i % 5) * 12;
+
+            GeneralPath glowLine = new GeneralPath();
+            glowLine.moveTo(xx, yy);
+            glowLine.curveTo(xx + len * 0.3, yy - 2, xx + len * 0.7, yy + 2, xx + len, yy);
+
+            g2d.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g2d.setColor(new Color(255, 240, 180, 100));
+            g2d.draw(glowLine);
+        }
+
+        // =========================================================
+        // 2. POSITION & DYNAMICS
+        // =========================================================
+        double move = Math.min(1.0, t);
+        int bx = (int) (80 + move * 430); // พิกัด X ของเรือ
+        int by = 370 + (int) (Math.sin(globalTime * 3.0) * 5); // ลอยตามน้ำขึ้นลงเบาๆ
+
+        // เงาเรือกระดาษใต้ผิวน้ำ
+        g2d.setColor(new Color(20, 60, 90, 80));
+        g2d.fillOval(bx - 120, by + 18, 240, 25);
+
+        // =========================================================
+        // 3. PAPER BOAT - BACKGROUND (ส่วนยอดใบเรือตรงกลางด้านหลัง)
+        // =========================================================
+        GeneralPath centerPeak = new GeneralPath();
+        centerPeak.moveTo(bx, by - 70);       // ยอดเรือแหลมตรงกลาง
+        centerPeak.lineTo(bx - 45, by - 10);  // ฝั่งซ้าย
+        centerPeak.lineTo(bx + 45, by - 10);  // ฝั่งขวา
+        centerPeak.closePath();
+
+        GradientPaint peakFill = new GradientPaint(
+                bx, by - 70, new Color(255, 255, 250),
+                bx, by - 10, new Color(225, 220, 210)
+        );
+        g2d.setPaint(peakFill);
+        g2d.fill(centerPeak);
+
+        // เส้นรอยพับกลางใบเรือ
+        g2d.setStroke(new BasicStroke(1.2f));
+        g2d.setColor(new Color(180, 180, 180));
+        g2d.drawLine(bx, by - 70, bx, by - 10);
+
+        // =========================================================
+        // 4. CHARACTERS (ใช้โมเดลตัวละครต้นฉบับของคุณ)
+        // =========================================================
+        drawFoxSitting(g2d, bx - 30, by - 22);
+        drawPrinceSitting(g2d, bx + 20, by - 28);
+
+        // =========================================================
+        // 5. PAPER BOAT - FRONT & SIDES (ตัวเรือกระดาษด้านหน้า)
+        // =========================================================
+        
+        // กราบเรือฝั่งซ้าย (Left Side Hull)
+        GeneralPath leftHull = new GeneralPath();
+        leftHull.moveTo(bx - 130, by);      // หัวเรือซ้าย
+        leftHull.lineTo(bx - 45, by - 10);  // มุมพับกลางซ้าย
+        leftHull.lineTo(bx, by + 22);       // ก้นเรือตรงกลาง
+        leftHull.closePath();
+
+        g2d.setColor(new Color(240, 238, 232));
+        g2d.fill(leftHull);
+
+        // กราบเรือฝั่งขวา (Right Side Hull)
+        GeneralPath rightHull = new GeneralPath();
+        rightHull.moveTo(bx + 130, by);     // ท้ายเรือขวา
+        rightHull.lineTo(bx + 45, by - 10); // มุมพับกลางขวา
+        rightHull.lineTo(bx, by + 22);      // ก้นเรือตรงกลาง
+        rightHull.closePath();
+
+        g2d.setColor(new Color(250, 248, 242));
+        g2d.fill(rightHull);
+
+        // กราบเรือด้านหน้าล่างสุด (Front Fold Rim - บังส่วนล่างก้นเรือ)
+        GeneralPath frontFold = new GeneralPath();
+        frontFold.moveTo(bx - 130, by);
+        frontFold.lineTo(bx, by + 22);
+        frontFold.lineTo(bx + 130, by);
+        frontFold.lineTo(bx, by + 32);      // จุดก้นเรือล่างสุด
+        frontFold.closePath();
+
+        GradientPaint frontFill = new GradientPaint(
+                bx, by, new Color(230, 225, 215),
+                bx, by + 32, new Color(195, 190, 180)
+        );
+        g2d.setPaint(frontFill);
+        g2d.fill(frontFold);
+
+        // =========================================================
+        // 6. OUTLINES & FOLD LINES (เส้นขอบและรอยพับกระดาษ)
+        // =========================================================
+        g2d.setStroke(new BasicStroke(1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2d.setColor(new Color(150, 145, 140));
+
+        // วาดขอบตัวเรือทั้งหมด
+        g2d.draw(leftHull);
+        g2d.draw(rightHull);
+        g2d.draw(frontFold);
+
+        // =========================================================
+        // 7. WATER RIPPLES (คลื่นน้ำรอบเรือกระดาษ)
+        // =========================================================
+        for (int i = 0; i < 3; i++) {
+            int d = i * 8;
+            GeneralPath ripple = new GeneralPath();
+            ripple.moveTo(bx - 135 - d, by + 10 + d);
+            ripple.curveTo(bx - 45, by + 38 + d, bx + 45, by + 40 + d, bx + 135 + d, by + 10 + d);
+
+            g2d.setStroke(new BasicStroke(1.5f - i * 0.3f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g2d.setColor(new Color(230, 242, 255, 130 - i * 35));
+            g2d.draw(ripple);
+        }
+    }
+/* 
     private void drawRiverScene(Graphics2D g2d, double t) {
         g2d.setColor(new Color(110, 140, 185));
         g2d.fillRect(0, 0, WIDTH, HEIGHT);
@@ -276,7 +410,7 @@ public class LittlePrinceSmoothStory extends JPanel implements ActionListener {
         drawPrinceSitting(g2d, bx, by - 25);
         drawFoxSitting(g2d, bx - 30, by - 20);
     }
-
+*/
     private void drawFlyingScene(Graphics2D g2d, double t) {
         g2d.setColor(new Color(24, 68, 92));
         g2d.fillRect(0, 0, WIDTH, HEIGHT);
