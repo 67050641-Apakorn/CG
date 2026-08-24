@@ -3,14 +3,16 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
 
-public class LittlePrince extends JPanel implements ActionListener {
+
+public class LittlePrinceSmoothStory extends JPanel implements ActionListener {
     private Timer timer;
     private double globalTime = 0;
     private final int WIDTH = 600;
     private final int HEIGHT = 600;
 
-    public LittlePrince() {
+    public LittlePrinceSmoothStory() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(new Color(245, 243, 238));
         // 60 FPS
@@ -27,57 +29,6 @@ public class LittlePrince extends JPanel implements ActionListener {
         repaint();
     }
 
-    // Midpoint Ellipse Algorithm
-    private void drawMidpointEllipse(Graphics2D g2d, int xc, int yc, int rx, int ry, Color color) {
-        g2d.setColor(color);
-        long rx2 = (long) rx * rx;
-        long ry2 = (long) ry * ry;
-        long twoRx2 = 2 * rx2;
-        long twoRy2 = 2 * ry2;
-
-        long x = 0;
-        long y = ry;
-        long px = 0;
-        long py = twoRx2 * y;
-
-        drawEllipsePixels(g2d, xc, yc, (int) x, (int) y);
-
-        double p1 = ry2 - (rx2 * ry) + (0.25 * rx2);
-        while (px < py) {
-            x++;
-            px += twoRy2;
-            if (p1 < 0) {
-                p1 += ry2 + px;
-            } else {
-                y--;
-                py -= twoRx2;
-                p1 += ry2 + px - py;
-            }
-            drawEllipsePixels(g2d, xc, yc, (int) x, (int) y);
-        }
-
-        double p2 = (ry2 * (x + 0.5) * (x + 0.5)) + (rx2 * (y - 1) * (y - 1)) - (rx2 * ry2);
-        while (y > 0) {
-            y--;
-            py -= twoRx2;
-            if (p2 > 0) {
-                p2 += rx2 - py;
-            } else {
-                x++;
-                px += twoRy2;
-                p2 += rx2 - py + px;
-            }
-            drawEllipsePixels(g2d, xc, yc, (int) x, (int) y);
-        }
-    }
-
-    private void drawEllipsePixels(Graphics2D g2d, int xc, int yc, int x, int y) {
-        g2d.fillRect(xc + x, yc + y, 2, 2);
-        g2d.fillRect(xc - x, yc + y, 2, 2);
-        g2d.fillRect(xc + x, yc - y, 2, 2);
-        g2d.fillRect(xc - x, yc - y, 2, 2);
-    }
-
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -88,7 +39,7 @@ public class LittlePrince extends JPanel implements ActionListener {
             drawBookOpening(g2d, globalTime / 2.5);
         } else if (globalTime < 5.0) {
             double t = (globalTime - 2.5) / 2.5;
-            drawPlanetScene(g2d, t);
+            drawFlowerMeadowScene(g2d, t); // ปรับเป็นฉากทุ่งดอกไม้
         } else if (globalTime < 7.5) {
             double t = (globalTime - 5.0) / 2.5;
             drawRiverScene(g2d, t);
@@ -176,27 +127,122 @@ public class LittlePrince extends JPanel implements ActionListener {
         }
     }
 
-    private void drawPlanetScene(Graphics2D g2d, double t) {
-        g2d.setColor(new Color(18, 24, 48));
+    // ==========================================
+    // ซีนแรก: ทุ่งดอกไม้ที่สุนัขจิ้งจอกมาหาเจ้าชายน้อย
+    // ==========================================
+    private void drawFlowerMeadowScene(Graphics2D g2d, double t) {
+        // 1. ท้องฟ้าอวกาศสีน้ำเงินเข้มแบบ Deep Night Sky
+        Point2D skyStart = new Point2D.Float(0, 0);
+        Point2D skyEnd = new Point2D.Float(0, HEIGHT);
+        LinearGradientPaint skyGrad = new LinearGradientPaint(skyStart, skyEnd, 
+                new float[]{0.0f, 0.5f, 1.0f}, 
+                new Color[]{new Color(8, 15, 38), new Color(15, 35, 75), new Color(10, 50, 100)});
+        g2d.setPaint(skyGrad);
         g2d.fillRect(0, 0, WIDTH, HEIGHT);
 
-        drawMidpointEllipse(g2d, 300, 680, 340, 280, new Color(45, 60, 40));
-        
-        g2d.setColor(new Color(75, 110, 70));
-        g2d.fillOval(-50, 420, 700, 300);
+        // 2. ทางช้างเผือกกระแสประกายดาว (Milky Way Stream)
+        g2d.setColor(new Color(130, 200, 255, 30));
+        GeneralPath milkyWay = new GeneralPath();
+        milkyWay.moveTo(50, 0);
+        milkyWay.curveTo(200, 150, 350, 200, 550, 0);
+        milkyWay.lineTo(600, 0);
+        milkyWay.curveTo(400, 250, 200, 200, 100, 0);
+        milkyWay.closePath();
+        g2d.fill(milkyWay);
 
-        for (int i = 0; i < 40; i++) {
-            int fx = (i * 17 + 30) % 550 + 25;
-            int fy = 450 + (int) (Math.sin(i + globalTime * 2) * 10) + (i % 5) * 15;
-            g2d.setColor(new Color(245, 180, 200, 200));
-            g2d.fillOval(fx, fy, 8, 8);
+        // ประกายดาวเล็กๆ กระจายเต็มท้องฟ้า
+        for (int i = 0; i < 70; i++) {
+            int sx = (i * 37 + 13) % WIDTH;
+            int sy = (i * 23 + 7) % 350;
+            int sSize = (i % 3 == 0) ? 3 : 2;
+            int alpha = 120 + (int)(Math.sin(globalTime * 3 + i) * 100);
+            g2d.setColor(new Color(255, 255, 230, Math.max(20, Math.min(255, alpha))));
+            g2d.fillOval(sx, sy, sSize, sSize);
         }
 
-        drawPrinceSitting(g2d, 220, 410);
+        // ประกายดาวดวงใหญ่ 4 แฉก
+        drawStarGlow(g2d, 80, 80, 10);
+        drawStarGlow(g2d, 500, 120, 12);
+        drawStarGlow(g2d, 420, 220, 8);
 
-        double foxMove = Math.min(1.0, t * 1.8);
-        int foxX = (int) (480 - foxMove * 140);
-        drawFoxSitting(g2d, foxX, 400);
+        // 3. ดาวเคราะห์สีเหลืองผิวมือระบายแบบสไตล์ศิลปะ (Yellow Painted Planet)
+        int planetX = 300;
+        int planetY = 660;
+        int planetR = 380;
+
+        // Gradient พื้นฐานของดาว
+        Point2D pStart = new Point2D.Float(planetX, planetY - planetR);
+        Point2D pEnd = new Point2D.Float(planetX, planetY + planetR);
+        LinearGradientPaint planetGrad = new LinearGradientPaint(pStart, pEnd,
+                new float[]{0.0f, 0.4f, 0.8f, 1.0f},
+                new Color[]{new Color(255, 225, 70), new Color(240, 185, 35), new Color(195, 135, 20), new Color(120, 75, 15)});
+        g2d.setPaint(planetGrad);
+        g2d.fillOval(planetX - planetR, planetY - planetR, planetR * 2, planetR * 2);
+
+        // ลาย Texture แปรงระบายสีบนดาวสีเหลือง (Painted Brush Strokes)
+        g2d.setColor(new Color(255, 240, 130, 90));
+        g2d.fillOval(planetX - 180, planetY - planetR + 20, 360, 180);
+        g2d.setColor(new Color(215, 150, 20, 70));
+        g2d.fillOval(planetX - 250, planetY - planetR + 120, 500, 200);
+        g2d.setColor(new Color(160, 100, 15, 80));
+        g2d.fillOval(planetX - 200, planetY - planetR + 220, 400, 180);
+
+        // 4. วาดตัวละครนั่งคู่กันบนยอดดาวสีเหลือง
+        // เจ้าชายน้อยนั่งอยู่ทางซ้ายของยอดดาว
+        drawPrinceSitting(g2d, planetX - 25, planetY - planetR + 12);
+
+        // สุนัขจิ้งจอก ค่อยๆ เดินเข้ามานั่งข้างๆ ทางขวา
+        double foxMove = Math.min(1.0, t * 1.5);
+        int foxX = (int) (planetX + 100 - foxMove * 70);
+        drawFoxSitting(g2d, foxX, planetY - planetR + 18);
+    }
+
+    // เมธอดเสริมสำหรับวาดดาวส่องสว่าง 4 แฉก
+    private void drawStarGlow(Graphics2D g2d, int cx, int cy, int size) {
+        g2d.setColor(new Color(255, 255, 220, 200));
+        g2d.drawLine(cx - size, cy, cx + size, cy);
+        g2d.drawLine(cx, cy - size, cx, cy + size);
+        g2d.setColor(Color.WHITE);
+        g2d.fillOval(cx - 2, cy - 2, 4, 4);
+    }
+
+    private void drawGradientCraterPlanet(Graphics2D g2d, int cx, int cy, int rx, int ry) {
+        Point2D start = new Point2D.Float(cx - rx * 0.4f, cy - ry * 0.6f);
+        Point2D end = new Point2D.Float(cx + rx * 0.6f, cy + ry * 0.6f);
+        float[] fractions = {0.0f, 0.45f, 0.85f, 1.0f};
+        Color[] colors = {
+            new Color(255, 205, 230), 
+            new Color(210, 140, 235), 
+            new Color(130, 95, 220),  
+            new Color(75, 55, 150)    
+        };
+        LinearGradientPaint planetGradient = new LinearGradientPaint(start, end, fractions, colors);
+
+        g2d.setPaint(planetGradient);
+        g2d.fillOval(cx - rx, cy - ry, rx * 2, ry * 2);
+
+        drawCrater(g2d, cx - 120, cy - 30, 45, 30, new Color(180, 115, 215), new Color(110, 75, 180));
+        drawCrater(g2d, cx + 40, cy + 20, 65, 45, new Color(160, 100, 210), new Color(90, 60, 160));
+        drawCrater(g2d, cx - 40, cy + 60, 50, 32, new Color(150, 90, 200), new Color(85, 55, 150));
+        drawCrater(g2d, cx + 130, cy - 40, 35, 25, new Color(190, 125, 225), new Color(120, 80, 190));
+        drawCrater(g2d, cx - 180, cy + 30, 28, 18, new Color(170, 105, 210), new Color(100, 65, 165));
+        drawCrater(g2d, cx + 170, cy + 50, 40, 26, new Color(130, 80, 185), new Color(75, 45, 135));
+    }
+
+    private void drawCrater(Graphics2D g2d, int x, int y, int w, int h, Color lightInner, Color darkInner) {
+        g2d.setColor(new Color(255, 230, 245, 180));
+        g2d.fillOval(x - 2, y - 2, w + 4, h + 4);
+
+        Point2D p1 = new Point2D.Float(x, y);
+        Point2D p2 = new Point2D.Float(x + w, y + h);
+        LinearGradientPaint craterGrad = new LinearGradientPaint(p1, p2, new float[]{0.0f, 1.0f}, new Color[]{darkInner, lightInner});
+        g2d.setPaint(craterGrad);
+        g2d.fillOval(x, y, w, h);
+
+        g2d.setColor(new Color( darkInner.getRed() - 20 < 0 ? 0 : darkInner.getRed() - 20, 
+                                 darkInner.getGreen() - 20 < 0 ? 0 : darkInner.getGreen() - 20, 
+                                 darkInner.getBlue() - 20 < 0 ? 0 : darkInner.getBlue() - 20, 160));
+        g2d.fillOval(x + w / 6, y + h / 6, (int)(w * 0.65), (int)(h * 0.65));
     }
 
     private void drawRiverScene(Graphics2D g2d, double t) {
@@ -231,9 +277,6 @@ public class LittlePrince extends JPanel implements ActionListener {
         drawFoxSitting(g2d, bx - 30, by - 20);
     }
 
-    // ==========================================
-    // ฉากบินพร้อมนกที่ปรับรูปทรงและจังหวะขยับปีก
-    // ==========================================
     private void drawFlyingScene(Graphics2D g2d, double t) {
         g2d.setColor(new Color(24, 68, 92));
         g2d.fillRect(0, 0, WIDTH, HEIGHT);
@@ -249,12 +292,10 @@ public class LittlePrince extends JPanel implements ActionListener {
             int birdX = flyX - 120 + i * 45;
             int birdY = flyY - 240 + (int) (Math.sin(globalTime * 2 + i) * 12);
 
-            // เชือกเชื่อม
             g2d.setColor(new Color(210, 225, 230, 180));
             g2d.setStroke(new BasicStroke(1.2f));
             g2d.drawLine(birdX, birdY, holdX, holdY);
 
-            // ปรับจังหวะขยับปีกให้นุ่มนวล ช้าลง (3.5)
             double wingFlap = Math.sin(globalTime * 3.5 + i * 0.6);
             drawProportionalFlappingBird(g2d, birdX, birdY, wingFlap);
         }
@@ -262,36 +303,30 @@ public class LittlePrince extends JPanel implements ActionListener {
         drawPrinceStandingFlight(g2d, flyX, flyY, holdX, holdY);
     }
 
-    // นกที่มีปีกสั้นสมส่วน ปากแหลมกระชับ และกระพือปีกอย่างนุ่มนวล
     private void drawProportionalFlappingBird(Graphics2D g2d, int x, int y, double flap) {
         g2d.setColor(Color.WHITE);
 
-        // 1. หัวและปากนกสั้นแหลม (Short & Sharp Beak)
         GeneralPath headAndBeak = new GeneralPath();
         headAndBeak.moveTo(x - 6, y - 2);
-        headAndBeak.curveTo(x - 9, y - 5, x - 12, y - 3, x - 13, y - 1); // หัวกลม
-        headAndBeak.lineTo(x - 16, y); // ปากแหลมสั้น
-        headAndBeak.lineTo(x - 13, y + 2); // มุมปากล่าง
-        headAndBeak.curveTo(x - 10, y + 4, x - 6, y + 4, x - 4, y + 2); // อกนก
+        headAndBeak.curveTo(x - 9, y - 5, x - 12, y - 3, x - 13, y - 1);
+        headAndBeak.lineTo(x - 16, y);
+        headAndBeak.lineTo(x - 13, y + 2);
+        headAndBeak.curveTo(x - 10, y + 4, x - 6, y + 4, x - 4, y + 2);
         headAndBeak.closePath();
         g2d.fill(headAndBeak);
 
-        // 2. ลำตัวและหาง (Body & Tail)
         GeneralPath bodyAndTail = new GeneralPath();
         bodyAndTail.moveTo(x - 6, y - 2);
-        bodyAndTail.curveTo(x, y - 3, x + 6, y - 1, x + 10, y + 1); // หลัง
-        bodyAndTail.lineTo(x + 18, y + 4); // ปลายหาง
+        bodyAndTail.curveTo(x, y - 3, x + 6, y - 1, x + 10, y + 1);
+        bodyAndTail.lineTo(x + 18, y + 4);
         bodyAndTail.lineTo(x + 16, y + 7);
-        bodyAndTail.lineTo(x + 8, y + 4); // ท้อง
+        bodyAndTail.lineTo(x + 8, y + 4);
         bodyAndTail.curveTo(x + 2, y + 5, x - 4, y + 3, x - 6, y + 1);
         bodyAndTail.closePath();
         g2d.fill(bodyAndTail);
 
-        // 3. ปีกทรงสวย สั้นกะทัดรัด (Flapping Wings)
-        // ระยะยกปีก (จำกัดความสูงไม่ให้ยาวเกินไป)
         double wingOffsetY = flap * 10.0; 
 
-        // ปีกไกล (Background Wing)
         GeneralPath wingBack = new GeneralPath();
         wingBack.moveTo(x - 2, y - 2);
         wingBack.curveTo(x - 4, y - 8 + wingOffsetY * 0.5, x - 8, y - 13 + wingOffsetY, x - 11, y - 15 + wingOffsetY);
@@ -299,7 +334,6 @@ public class LittlePrince extends JPanel implements ActionListener {
         wingBack.closePath();
         g2d.fill(wingBack);
 
-        // ปีกใกล้ (Foreground Wing)
         GeneralPath wingFront = new GeneralPath();
         wingFront.moveTo(x - 3, y - 1);
         wingFront.curveTo(x - 6, y - 10 + wingOffsetY * 0.6, x - 10, y - 17 + wingOffsetY, x - 14, y - 19 + wingOffsetY);
@@ -385,10 +419,10 @@ public class LittlePrince extends JPanel implements ActionListener {
 
     private void drawRoseAndClosingBook(Graphics2D g2d, double t) {
         if (t < 0.6) {
-            g2d.setColor(new Color(250, 225, 200));
+            g2d.setColor(new Color(18, 22, 45));
             g2d.fillRect(0, 0, WIDTH, HEIGHT);
 
-            drawMidpointEllipse(g2d, 300, 650, 360, 220, new Color(190, 120, 80));
+            drawGradientCraterPlanet(g2d, 300, 650, 360, 220);
 
             int rx = 300;
             int ry = 360;
@@ -608,8 +642,8 @@ public class LittlePrince extends JPanel implements ActionListener {
     }
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame("The Little Prince - Smooth Bird Flapping");
-        LittlePrince anim = new LittlePrince();
+        JFrame frame = new JFrame("The Little Prince - Flower Meadow Scene");
+        LittlePrinceSmoothStory anim = new LittlePrinceSmoothStory();
         frame.add(anim);
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
