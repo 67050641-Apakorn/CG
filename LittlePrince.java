@@ -5,13 +5,13 @@ import java.awt.event.ActionListener;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 
-public class LittlePrinceSmoothStory extends JPanel implements ActionListener {
+public class LittlePrince extends JPanel implements ActionListener {
     private Timer timer;
     private double globalTime = 0;
     private final int WIDTH = 600;
     private final int HEIGHT = 600;
 
-    public LittlePrinceSmoothStory() {
+    public LittlePrince() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(new Color(245, 243, 238));
         timer = new Timer(16, this); 
@@ -1242,7 +1242,7 @@ public class LittlePrinceSmoothStory extends JPanel implements ActionListener {
     
     public static void main(String[] args) {
         JFrame frame = new JFrame("The Little Prince - Smooth Story");
-        LittlePrinceSmoothStory anim = new LittlePrinceSmoothStory();
+        LittlePrince anim = new LittlePrinceS();
         frame.add(anim);
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
