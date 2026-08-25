@@ -1,5 +1,3 @@
-package Assignment1;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -7,14 +5,13 @@ import java.awt.event.ActionListener;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 
-
-public class LittlePrinceSmoothStory extends JPanel implements ActionListener {
+public class LittlePrince extends JPanel implements ActionListener {
     private Timer timer;
     private double globalTime = 0;
     private final int WIDTH = 600;
     private final int HEIGHT = 600;
 
-    public LittlePrinceSmoothStory() {
+    public LittlePrince() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(new Color(245, 243, 238));
         // 60 FPS
@@ -26,7 +23,7 @@ public class LittlePrinceSmoothStory extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         globalTime += 0.025; // ความเร็วฉากละ ~2.5 วินาที
         if (globalTime > 12.5) { // รวม 5 ฉาก ~12.5 วินาที
-            globalTime = 0; // วนลูป
+            globalTime = 0; // วนลูปการทำงาน
         }
         repaint();
     }
@@ -37,25 +34,37 @@ public class LittlePrinceSmoothStory extends JPanel implements ActionListener {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+        // ==========================================
+        // ตัวสลับฉากตามช่วงเวลา (SCENE SWITCHER)
+        // ==========================================
         if (globalTime < 2.5) {
+            // SCENE 1: เปิดหนังสือ
             drawBookOpening(g2d, globalTime / 2.5);
         } else if (globalTime < 5.0) {
+            // SCENE 2: เจ้าชายน้อยและจิ้งจอกบนดาวสีเหลือง
             double t = (globalTime - 2.5) / 2.5;
-            drawFlowerMeadowScene(g2d, t); // ปรับเป็นฉากทุ่งดอกไม้
+            drawFlowerMeadowScene(g2d, t);
         } else if (globalTime < 7.5) {
+            // SCENE 3: ล่องเรือกระดาษในแม่น้ำ
             double t = (globalTime - 5.0) / 2.5;
             drawRiverScene(g2d, t);
         } else if (globalTime < 10.0) {
+            // SCENE 4: บินไปกับฝูงนก
             double t = (globalTime - 7.5) / 2.5;
             drawFlyingScene(g2d, t);
         } else {
+            // SCENE 5: ดอกกุหลาบในครอบแก้ว และปิดหนังสือ
             double t = (globalTime - 10.0) / 2.5;
             drawRoseAndClosingBook(g2d, t);
         }
 
+        // วาดเอฟเฟกต์ละอองดาวเรืองแสงลอยทั่วทั้งหน้าจอ
         drawFloatingGlowParticles(g2d);
     }
 
+    // ==========================================
+    // เอฟเฟกต์ส่วนกลาง (GLOBAL EFFECTS)
+    // ==========================================
     private void drawFloatingGlowParticles(Graphics2D g2d) {
         for (int i = 0; i < 20; i++) {
             double px = (Math.sin(globalTime * 0.8 + i * 1.3) * 0.5 + 0.5) * 600;
@@ -66,6 +75,9 @@ public class LittlePrinceSmoothStory extends JPanel implements ActionListener {
         }
     }
 
+    // ==========================================
+    // SCENE 1: การเปิดหนังสือ (BOOK OPENING SCENE)
+    // ==========================================
     private void drawBookOpening(Graphics2D g2d, double t) {
         g2d.setColor(new Color(20, 30, 55));
         g2d.fillRect(0, 0, WIDTH, HEIGHT);
@@ -79,14 +91,17 @@ public class LittlePrinceSmoothStory extends JPanel implements ActionListener {
 
         if (maxW < 10) return;
 
+        // ปกหนังสือด้านนอก
         g2d.setColor(new Color(55, 33, 22));
         g2d.fillRoundRect(cx - maxW - 12, cy - maxH / 2 - 6, (maxW + 12) * 2, maxH + 30, 20, 20);
 
+        // สันและขอบหนังสือ
         g2d.setColor(new Color(210, 185, 140));
         g2d.fillRoundRect(cx - maxW - 6, cy - maxH / 2 + 10, maxW * 2 + 12, maxH, 8, 8);
         g2d.setColor(new Color(140, 115, 80));
         g2d.drawRoundRect(cx - maxW - 6, cy - maxH / 2 + 10, maxW * 2 + 12, maxH, 8, 8);
 
+        // หน้าหนังสือฝั่งซ้าย
         GeneralPath leftPage = new GeneralPath();
         leftPage.moveTo(cx, cy + maxH / 2);
         leftPage.curveTo(cx - maxW * 0.5, cy + maxH / 2 - 10, cx - maxW + 10, cy + maxH / 2 - 25, cx - maxW, cy + maxH / 2 - 35);
@@ -99,6 +114,7 @@ public class LittlePrinceSmoothStory extends JPanel implements ActionListener {
         g2d.setColor(new Color(180, 155, 120));
         g2d.draw(leftPage);
 
+        // หน้าหนังสือฝั่งขวา
         GeneralPath rightPage = new GeneralPath();
         rightPage.moveTo(cx, cy + maxH / 2);
         rightPage.curveTo(cx + maxW * 0.5, cy + maxH / 2 - 10, cx + maxW - 10, cy + maxH / 2 - 25, cx + maxW, cy + maxH / 2 - 35);
@@ -111,9 +127,11 @@ public class LittlePrinceSmoothStory extends JPanel implements ActionListener {
         g2d.setColor(new Color(180, 155, 120));
         g2d.draw(rightPage);
 
+        // เงาร่องกลางหนังสือ
         g2d.setColor(new Color(90, 65, 45, 140));
         g2d.fillRect(cx - 5, cy - maxH / 2 - 10, 10, maxH + 15);
 
+        // ตัวหนังสือและข้อความชื่อเรื่อง
         if (t > 0.45) {
             g2d.setColor(new Color(80, 60, 45, 180));
             for (int i = 0; i < 7; i++) {
@@ -130,7 +148,7 @@ public class LittlePrinceSmoothStory extends JPanel implements ActionListener {
     }
 
     // ==========================================
-    // ซีนแรก: ทุ่งดอกไม้ที่สุนัขจิ้งจอกมาหาเจ้าชายน้อย
+    // SCENE 2: ดาวสีเหลืองกลางอวกาศ (YELLOW PLANET SCENE)
     // ==========================================
     private void drawFlowerMeadowScene(Graphics2D g2d, double t) {
         // 1. ท้องฟ้าอวกาศสีน้ำเงินเข้มแบบ Deep Night Sky
@@ -199,15 +217,326 @@ public class LittlePrinceSmoothStory extends JPanel implements ActionListener {
         drawFoxSitting(g2d, foxX, planetY - planetR + 18);
     }
 
-    // เมธอดเสริมสำหรับวาดดาวส่องสว่าง 4 แฉก
-    private void drawStarGlow(Graphics2D g2d, int cx, int cy, int size) {
-        g2d.setColor(new Color(255, 255, 220, 200));
-        g2d.drawLine(cx - size, cy, cx + size, cy);
-        g2d.drawLine(cx, cy - size, cx, cy + size);
-        g2d.setColor(Color.WHITE);
-        g2d.fillOval(cx - 2, cy - 2, 4, 4);
+    // ==========================================
+    // SCENE 3: ล่องเรือกระดาษในแม่น้ำดอกไม้ (FLOWER RIVER SCENE)
+    // ==========================================
+    private void drawRiverScene(Graphics2D g2d, double t) {
+
+        // 1. BACKGROUND & WATER GRADIENT (ผิวน้ำสีฟ้าพาสเทลไล่เฉด)
+        Point2D wStart = new Point2D.Float(0, 0);
+        Point2D wEnd = new Point2D.Float(0, HEIGHT);
+        LinearGradientPaint waterGrad = new LinearGradientPaint(wStart, wEnd,
+                new float[]{0.0f, 0.5f, 1.0f},
+                new Color[]{new Color(135, 175, 215), new Color(85, 135, 185), new Color(45, 90, 145)});
+        g2d.setPaint(waterGrad);
+        g2d.fillRect(0, 0, WIDTH, HEIGHT);
+
+        // 2. ตลิ่งพุ่มดอกไม้ริมฝั่งแม่น้ำ (ฝั่งซ้ายและขวา)
+        drawRiverBankFlowers(g2d);
+
+        // 3. ประกายดาวเรืองแสงระยิบระยับบนผิวน้ำ (Water Sparkles & Stars)
+        for (int i = 0; i < 35; i++) {
+            int sx = (i * 67 + (int)(globalTime * 15)) % (WIDTH + 100) - 50;
+            int sy = (i * 37 + 20) % HEIGHT;
+            
+            // ดาวเรืองแสง 4 แฉกบนผิวน้ำ
+            if (i % 3 == 0) {
+                int starAlpha = 140 + (int)(Math.sin(globalTime * 4 + i) * 100);
+                g2d.setColor(new Color(255, 255, 230, Math.max(30, Math.min(255, starAlpha))));
+                int sSize = 6 + (i % 4) * 2;
+                g2d.drawLine(sx - sSize, sy, sx + sSize, sy);
+                g2d.drawLine(sx, sy - sSize, sx, sy + sSize);
+                g2d.fillOval(sx - 1, sy - 1, 3, 3);
+            } else {
+                // ละอองทองเรืองแสงลอยตามน้ำ
+                int glowAlpha = 100 + (int)(Math.cos(globalTime * 3 + i) * 80);
+                g2d.setColor(new Color(255, 240, 180, Math.max(20, Math.min(255, glowAlpha))));
+                g2d.fillOval(sx, sy, 3, 3);
+            }
+        }
+
+        // เส้นแสงสะท้อนระลอกน้ำทองคำ
+        for (int i = 0; i < 18; i++) {
+            int yy = 80 + (i * 31) % 460;
+            int xx = (int) ((i * 77 + globalTime * 20) % 700) - 80;
+            int len = 25 + (i % 5) * 15;
+
+            GeneralPath glowLine = new GeneralPath();
+            glowLine.moveTo(xx, yy);
+            glowLine.curveTo(xx + len * 0.3, yy - 3, xx + len * 0.7, yy + 3, xx + len, yy);
+
+            g2d.setStroke(new BasicStroke(1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g2d.setColor(new Color(255, 245, 200, 110));
+            g2d.draw(glowLine);
+        }
+
+        // 4. POSITION & DYNAMICS
+        double move = Math.min(1.0, t);
+        int bx = (int) (80 + move * 430); // พิกัด X ของเรือ
+        int by = 340 + (int) (Math.sin(globalTime * 3.0) * 6); // ลอยตามน้ำขึ้นลงเบาๆ
+
+        // เงาเรือกระดาษใต้ผิวน้ำ
+        g2d.setColor(new Color(20, 50, 80, 90));
+        g2d.fillOval(bx - 120, by + 18, 240, 25);
+
+        // 5. PAPER BOAT - BACKGROUND (ส่วนยอดใบเรือตรงกลางด้านหลัง)
+        GeneralPath centerPeak = new GeneralPath();
+        centerPeak.moveTo(bx, by - 70);       
+        centerPeak.lineTo(bx - 45, by - 10);  
+        centerPeak.lineTo(bx + 45, by - 10);  
+        centerPeak.closePath();
+
+        GradientPaint peakFill = new GradientPaint(
+                bx, by - 70, new Color(255, 255, 250),
+                bx, by - 10, new Color(225, 220, 210)
+        );
+        g2d.setPaint(peakFill);
+        g2d.fill(centerPeak);
+
+        g2d.setStroke(new BasicStroke(1.2f));
+        g2d.setColor(new Color(180, 180, 180));
+        g2d.drawLine(bx, by - 70, bx, by - 10);
+
+        // 6. CHARACTERS (ตัวละครนั่งอยู่ในลำเรือ)
+        drawFoxSitting(g2d, bx - 30, by - 22);
+        drawPrinceSitting(g2d, bx + 20, by - 28);
+
+        // 7. PAPER BOAT - FRONT & SIDES (ตัวเรือกระดาษด้านหน้า)
+        GeneralPath leftHull = new GeneralPath();
+        leftHull.moveTo(bx - 130, by);      
+        leftHull.lineTo(bx - 45, by - 10);  
+        leftHull.lineTo(bx, by + 22);       
+        leftHull.closePath();
+
+        g2d.setColor(new Color(240, 238, 232));
+        g2d.fill(leftHull);
+
+        GeneralPath rightHull = new GeneralPath();
+        rightHull.moveTo(bx + 130, by);     
+        rightHull.lineTo(bx + 45, by - 10); 
+        rightHull.lineTo(bx, by + 22);      
+        rightHull.closePath();
+
+        g2d.setColor(new Color(250, 248, 242));
+        g2d.fill(rightHull);
+
+        GeneralPath frontFold = new GeneralPath();
+        frontFold.moveTo(bx - 130, by);
+        frontFold.lineTo(bx, by + 22);
+        frontFold.lineTo(bx + 130, by);
+        frontFold.lineTo(bx, by + 32);      
+        frontFold.closePath();
+
+        GradientPaint frontFill = new GradientPaint(
+                bx, by, new Color(230, 225, 215),
+                bx, by + 32, new Color(195, 190, 180)
+        );
+        g2d.setPaint(frontFill);
+        g2d.fill(frontFold);
+
+        // 8. OUTLINES & FOLD LINES
+        g2d.setStroke(new BasicStroke(1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2d.setColor(new Color(150, 145, 140));
+
+        g2d.draw(leftHull);
+        g2d.draw(rightHull);
+        g2d.draw(frontFold);
+
+        // 9. WATER RIPPLES (คลื่นน้ำเรืองแสงรอบเรือ)
+        for (int i = 0; i < 3; i++) {
+            int d = i * 8;
+            GeneralPath ripple = new GeneralPath();
+            ripple.moveTo(bx - 135 - d, by + 10 + d);
+            ripple.curveTo(bx - 45, by + 38 + d, bx + 45, by + 40 + d, bx + 135 + d, by + 10 + d);
+
+            g2d.setStroke(new BasicStroke(1.5f - i * 0.3f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g2d.setColor(new Color(255, 245, 210, 140 - i * 40));
+            g2d.draw(ripple);
+        }
     }
 
+    // ==========================================
+    // เมธอดวาดพุ่มดอกไม้ตลิ่งริมแม่น้ำ
+    // ==========================================
+    private void drawRiverBankFlowers(Graphics2D g2d) {
+        // ตลิ่งฝั่งซ้ายบน
+        drawSoftFlowerCluster(g2d, -30, -20, 180, 160, new Color(245, 235, 220, 180));
+        drawSoftFlowerCluster(g2d, -20, 100, 140, 150, new Color(250, 225, 210, 160));
+        
+        // ตลิ่งฝั่งซ้ายล่าง
+        drawSoftFlowerCluster(g2d, -40, 420, 220, 200, new Color(240, 230, 245, 190));
+
+        // ตลิ่งฝั่งขวาบน
+        drawSoftFlowerCluster(g2d, 450, -30, 200, 180, new Color(255, 240, 215, 170));
+        drawSoftFlowerCluster(g2d, 480, 120, 160, 160, new Color(230, 225, 245, 160));
+
+        // ตลิ่งฝั่งขวาล่าง
+        drawSoftFlowerCluster(g2d, 440, 450, 210, 180, new Color(250, 230, 220, 180));
+    }
+
+    private void drawSoftFlowerCluster(Graphics2D g2d, int x, int y, int w, int h, Color baseColor) {
+        // พื้นหลังพุ่มเงาอ่อน
+        g2d.setColor(new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), 60));
+        g2d.fillOval(x - 10, y - 10, w + 20, h + 20);
+
+        // ดอกไม้ทรงกลมสไตล์ฟุ้งฝัน
+        g2d.setColor(baseColor);
+        g2d.fillOval(x, y, w, h);
+
+        // ดอกไม้บานย่อยๆ ในพุ่ม
+        g2d.setColor(new Color(255, 255, 255, 200));
+        g2d.fillOval(x + w / 4, y + h / 4, w / 3, h / 3);
+        g2d.fillOval(x + w / 2, y + h / 3, w / 4, h / 4);
+
+        // เกสรสีทองเรืองแสง
+        g2d.setColor(new Color(255, 210, 120, 210));
+        g2d.fillOval(x + w / 4 + 8, y + h / 4 + 8, 8, 8);
+        g2d.fillOval(x + w / 2 + 5, y + h / 3 + 5, 6, 6);
+    }
+
+    // ==========================================
+    // SCENE 4: การบินท้องฟ้ากับฝูงนกในอวกาศ (SPACE FLYING SCENE)
+    // ==========================================
+    private void drawFlyingScene(Graphics2D g2d, double t) {
+        // 1. พื้นหลังอวกาศแบบไล่เฉดสี (Deep Space Gradient)
+        Point2D skyStart = new Point2D.Float(0, 0);
+        Point2D skyEnd = new Point2D.Float(0, HEIGHT);
+        LinearGradientPaint skyGrad = new LinearGradientPaint(skyStart, skyEnd,
+                new float[]{0.0f, 0.4f, 0.8f, 1.0f},
+                new Color[]{new Color(5, 10, 30), new Color(15, 30, 70), new Color(25, 55, 115), new Color(15, 35, 80)});
+        g2d.setPaint(skyGrad);
+        g2d.fillRect(0, 0, WIDTH, HEIGHT);
+
+        // 2. กระแสทางช้างเผือกเรืองแสง (Milky Way Nebula Flow)
+        g2d.setColor(new Color(100, 160, 240, 25));
+        GeneralPath nebula = new GeneralPath();
+        nebula.moveTo(0, 50);
+        nebula.curveTo(200, 150, 400, 100, 600, 300);
+        nebula.lineTo(600, 450);
+        nebula.curveTo(350, 250, 150, 300, 0, 200);
+        nebula.closePath();
+        g2d.fill(nebula);
+
+        // 3. ดาวเคราะห์และดาวบริวารในอวกาศ (Planets)
+        // ดาวเคราะห์มีวงแหวนสไตล์ Saturn (ฝั่งซ้าย)
+        drawRingedPlanet(g2d, 100, 260, 32);
+        
+        // ดาวเคราะห์ดวงเล็กเรืองแสง (ฝั่งขวา)
+        drawGlowingPlanet(g2d, 480, 320, 22, new Color(245, 210, 130));
+        drawGlowingPlanet(g2d, 460, 510, 14, new Color(230, 215, 170));
+
+        // 4. ประกายดาวกระพริบและดาว 5 แฉกกระจายทั่วท้องฟ้า
+        for (int i = 0; i < 80; i++) {
+            int sx = (i * 43 + 17) % WIDTH;
+            int sy = (i * 29 + 11) % HEIGHT;
+            int sSize = (i % 4 == 0) ? 3 : 2;
+            int alpha = 100 + (int)(Math.sin(globalTime * 3 + i) * 120);
+            g2d.setColor(new Color(255, 255, 220, Math.max(30, Math.min(255, alpha))));
+            g2d.fillOval(sx, sy, sSize, sSize);
+
+            // สุ่มวาดดาวดวงใหญ่/ดาว 5 แฉกประปราย
+            if (i % 12 == 0) {
+                drawMiniStar(g2d, sx, sy, 5);
+            }
+        }
+
+        // ประกายดาวเรืองแสงแฉกใหญ่
+        drawStarGlow(g2d, 120, 70, 12);
+        drawStarGlow(g2d, 480, 100, 14);
+        drawStarGlow(g2d, 230, 220, 10);
+        drawStarGlow(g2d, 520, 240, 8);
+
+        // 5. ตัวละครฝูงนกและการบินของเจ้าชายน้อย
+        int flyX = (int) (180 + t * 220);
+        int flyY = (int) (400 - Math.sin(t * Math.PI) * 100);
+
+        int holdX = flyX + 16;
+        int holdY = flyY - 26;
+
+        // วาดฝูงนกพร้อมเชือกโยง
+        int numBirds = 6;
+        for (int i = 0; i < numBirds; i++) {
+            int birdX = flyX - 120 + i * 45;
+            int birdY = flyY - 240 + (int) (Math.sin(globalTime * 2 + i) * 12);
+
+            // เชือกโยงสีขาวเรืองแสง
+            g2d.setColor(new Color(225, 240, 255, 190));
+            g2d.setStroke(new BasicStroke(1.2f));
+            g2d.drawLine(birdX, birdY, holdX, holdY);
+
+            double wingFlap = Math.sin(globalTime * 3.5 + i * 0.6);
+            drawProportionalFlappingBird(g2d, birdX, birdY, wingFlap);
+        }
+
+        // วาดเจ้าชายน้อยท่าบิน
+        drawPrinceStandingFlight(g2d, flyX, flyY, holdX, holdY);
+    }
+
+    // ==========================================
+    // เมธอดช่วยวาดดาวเคราะห์ในอวกาศเพิ่มเติม
+    // ==========================================
+    private void drawRingedPlanet(Graphics2D g2d, int cx, int cy, int radius) {
+        // เงาวงแหวนด้านหลังดาว
+        g2d.setColor(new Color(180, 160, 130, 140));
+        g2d.setStroke(new BasicStroke(4.0f));
+        g2d.drawOval(cx - radius - 18, cy - 8, (radius + 18) * 2, 16);
+
+        // ตัวดาวเคราะห์
+        Point2D p1 = new Point2D.Float(cx - radius, cy - radius);
+        Point2D p2 = new Point2D.Float(cx + radius, cy + radius);
+        LinearGradientPaint pGrad = new LinearGradientPaint(p1, p2,
+                new float[]{0.0f, 0.5f, 1.0f},
+                new Color[]{new Color(240, 200, 140), new Color(190, 140, 80), new Color(110, 70, 35)});
+        g2d.setPaint(pGrad);
+        g2d.fillOval(cx - radius, cy - radius, radius * 2, radius * 2);
+
+        // วงแหวนด้านหน้าดาว
+        g2d.setColor(new Color(220, 195, 155, 210));
+        g2d.setStroke(new BasicStroke(3.0f));
+        g2d.drawArc(cx - radius - 18, cy - 8, (radius + 18) * 2, 16, 180, 180);
+    }
+
+    private void drawGlowingPlanet(Graphics2D g2d, int cx, int cy, int radius, Color color) {
+        // ออร่าเรืองแสงรอบดาว
+        g2d.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 60));
+        g2d.fillOval(cx - radius - 4, cy - radius - 4, (radius + 4) * 2, (radius + 4) * 2);
+
+        // ตัวดาว
+        g2d.setColor(color);
+        g2d.fillOval(cx - radius, cy - radius, radius * 2, radius * 2);
+    }
+
+    // ==========================================
+    // SCENE 5: ดอกกุหลาบและปิดหนังสือ (ROSE & CLOSING BOOK SCENE)
+    // ==========================================
+    private void drawRoseAndClosingBook(Graphics2D g2d, double t) {
+        if (t < 0.6) {
+            // ช่วงแรกของฉาก: โชว์ดาวสีม่วง ดอกกุหลาบในครอบแก้ว และตัวละคร
+            g2d.setColor(new Color(18, 22, 45));
+            g2d.fillRect(0, 0, WIDTH, HEIGHT);
+
+            drawGradientCraterPlanet(g2d, 300, 650, 360, 220);
+
+            int rx = 300;
+            int ry = 360;
+
+            drawDetailedRoseWithDome(g2d, rx, ry);
+
+            drawPrinceSitting(g2d, rx - 100, ry + 75);
+            drawFoxSitting(g2d, rx + 80, ry + 70);
+        } else {
+            // ช่วงหลังของฉาก: ทำอนิเมชันปิดหนังสือกลับ
+            double closeT = (t - 0.6) / 0.4;
+            g2d.setColor(new Color(25, 35, 60));
+            g2d.fillRect(0, 0, WIDTH, HEIGHT);
+
+            drawBookOpening(g2d, 1.0 - closeT);
+        }
+    }
+
+    // ==========================================
+    // เมธอดช่วยวาดดาวเคราะห์และหลุมอุกกาบาต (PLANET & CRATERS)
+    // ==========================================
     private void drawGradientCraterPlanet(Graphics2D g2d, int cx, int cy, int rx, int ry) {
         Point2D start = new Point2D.Float(cx - rx * 0.4f, cy - ry * 0.6f);
         Point2D end = new Point2D.Float(cx + rx * 0.6f, cy + ry * 0.6f);
@@ -246,195 +575,16 @@ public class LittlePrinceSmoothStory extends JPanel implements ActionListener {
                                  darkInner.getBlue() - 20 < 0 ? 0 : darkInner.getBlue() - 20, 160));
         g2d.fillOval(x + w / 6, y + h / 6, (int)(w * 0.65), (int)(h * 0.65));
     }
+
     // ==========================================
-    // ซีนแม่น้ำ: เรือกระดาษลอยน้ำพร้อมโมเดลตัวละครเดิมของคุณ
+    // เมธอดช่วยวาดองค์ประกอบอื่น ๆ (HELPER DRAWINGS)
     // ==========================================
-    private void drawRiverScene(Graphics2D g2d, double t) {
-
-        // =========================================================
-        // 1. BACKGROUND & WATER GRADIENT
-        // =========================================================
-        GradientPaint water = new GradientPaint(
-                0, 0, new Color(110, 155, 200),
-                0, HEIGHT, new Color(55, 105, 155)
-        );
-        g2d.setPaint(water);
-        g2d.fillRect(0, 0, WIDTH, HEIGHT);
-
-        // เส้นแสงสะท้อนผิวน้ำ
-        for (int i = 0; i < 22; i++) {
-            int yy = 130 + (i * 31) % 440;
-            int xx = (int) ((i * 77 + globalTime * 25) % 700) - 80;
-            int len = 20 + (i % 5) * 12;
-
-            GeneralPath glowLine = new GeneralPath();
-            glowLine.moveTo(xx, yy);
-            glowLine.curveTo(xx + len * 0.3, yy - 2, xx + len * 0.7, yy + 2, xx + len, yy);
-
-            g2d.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-            g2d.setColor(new Color(255, 240, 180, 100));
-            g2d.draw(glowLine);
-        }
-
-        // =========================================================
-        // 2. POSITION & DYNAMICS
-        // =========================================================
-        double move = Math.min(1.0, t);
-        int bx = (int) (80 + move * 430); // พิกัด X ของเรือ
-        int by = 370 + (int) (Math.sin(globalTime * 3.0) * 5); // ลอยตามน้ำขึ้นลงเบาๆ
-
-        // เงาเรือกระดาษใต้ผิวน้ำ
-        g2d.setColor(new Color(20, 60, 90, 80));
-        g2d.fillOval(bx - 120, by + 18, 240, 25);
-
-        // =========================================================
-        // 3. PAPER BOAT - BACKGROUND (ส่วนยอดใบเรือตรงกลางด้านหลัง)
-        // =========================================================
-        GeneralPath centerPeak = new GeneralPath();
-        centerPeak.moveTo(bx, by - 70);       // ยอดเรือแหลมตรงกลาง
-        centerPeak.lineTo(bx - 45, by - 10);  // ฝั่งซ้าย
-        centerPeak.lineTo(bx + 45, by - 10);  // ฝั่งขวา
-        centerPeak.closePath();
-
-        GradientPaint peakFill = new GradientPaint(
-                bx, by - 70, new Color(255, 255, 250),
-                bx, by - 10, new Color(225, 220, 210)
-        );
-        g2d.setPaint(peakFill);
-        g2d.fill(centerPeak);
-
-        // เส้นรอยพับกลางใบเรือ
-        g2d.setStroke(new BasicStroke(1.2f));
-        g2d.setColor(new Color(180, 180, 180));
-        g2d.drawLine(bx, by - 70, bx, by - 10);
-
-        // =========================================================
-        // 4. CHARACTERS (ใช้โมเดลตัวละครต้นฉบับของคุณ)
-        // =========================================================
-        drawFoxSitting(g2d, bx - 30, by - 22);
-        drawPrinceSitting(g2d, bx + 20, by - 28);
-
-        // =========================================================
-        // 5. PAPER BOAT - FRONT & SIDES (ตัวเรือกระดาษด้านหน้า)
-        // =========================================================
-        
-        // กราบเรือฝั่งซ้าย (Left Side Hull)
-        GeneralPath leftHull = new GeneralPath();
-        leftHull.moveTo(bx - 130, by);      // หัวเรือซ้าย
-        leftHull.lineTo(bx - 45, by - 10);  // มุมพับกลางซ้าย
-        leftHull.lineTo(bx, by + 22);       // ก้นเรือตรงกลาง
-        leftHull.closePath();
-
-        g2d.setColor(new Color(240, 238, 232));
-        g2d.fill(leftHull);
-
-        // กราบเรือฝั่งขวา (Right Side Hull)
-        GeneralPath rightHull = new GeneralPath();
-        rightHull.moveTo(bx + 130, by);     // ท้ายเรือขวา
-        rightHull.lineTo(bx + 45, by - 10); // มุมพับกลางขวา
-        rightHull.lineTo(bx, by + 22);      // ก้นเรือตรงกลาง
-        rightHull.closePath();
-
-        g2d.setColor(new Color(250, 248, 242));
-        g2d.fill(rightHull);
-
-        // กราบเรือด้านหน้าล่างสุด (Front Fold Rim - บังส่วนล่างก้นเรือ)
-        GeneralPath frontFold = new GeneralPath();
-        frontFold.moveTo(bx - 130, by);
-        frontFold.lineTo(bx, by + 22);
-        frontFold.lineTo(bx + 130, by);
-        frontFold.lineTo(bx, by + 32);      // จุดก้นเรือล่างสุด
-        frontFold.closePath();
-
-        GradientPaint frontFill = new GradientPaint(
-                bx, by, new Color(230, 225, 215),
-                bx, by + 32, new Color(195, 190, 180)
-        );
-        g2d.setPaint(frontFill);
-        g2d.fill(frontFold);
-
-        // =========================================================
-        // 6. OUTLINES & FOLD LINES (เส้นขอบและรอยพับกระดาษ)
-        // =========================================================
-        g2d.setStroke(new BasicStroke(1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        g2d.setColor(new Color(150, 145, 140));
-
-        // วาดขอบตัวเรือทั้งหมด
-        g2d.draw(leftHull);
-        g2d.draw(rightHull);
-        g2d.draw(frontFold);
-
-        // =========================================================
-        // 7. WATER RIPPLES (คลื่นน้ำรอบเรือกระดาษ)
-        // =========================================================
-        for (int i = 0; i < 3; i++) {
-            int d = i * 8;
-            GeneralPath ripple = new GeneralPath();
-            ripple.moveTo(bx - 135 - d, by + 10 + d);
-            ripple.curveTo(bx - 45, by + 38 + d, bx + 45, by + 40 + d, bx + 135 + d, by + 10 + d);
-
-            g2d.setStroke(new BasicStroke(1.5f - i * 0.3f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-            g2d.setColor(new Color(230, 242, 255, 130 - i * 35));
-            g2d.draw(ripple);
-        }
-    }
-/* 
-    private void drawRiverScene(Graphics2D g2d, double t) {
-        g2d.setColor(new Color(110, 140, 185));
-        g2d.fillRect(0, 0, WIDTH, HEIGHT);
-
-        GeneralPath bank = new GeneralPath();
-        bank.moveTo(0, 0);
-        bank.curveTo(200, 150, 400, 50, 600, 200);
-        bank.lineTo(600, 0);
-        bank.closePath();
-        g2d.setColor(new Color(210, 200, 180));
-        g2d.fill(bank);
-
-        double boatPath = t * 400;
-        int bx = (int) (100 + boatPath * 0.9);
-        int by = (int) (280 + Math.sin(t * Math.PI * 3) * 20);
-
-        g2d.setColor(new Color(245, 215, 120));
-        GeneralPath leaf = new GeneralPath();
-        leaf.moveTo(bx - 60, by);
-        leaf.curveTo(bx - 20, by + 40, bx + 50, by + 30, bx + 80, by);
-        leaf.curveTo(bx + 20, by - 15, bx - 30, by - 10, bx - 60, by);
-        leaf.closePath();
-        g2d.fill(leaf);
-
-        g2d.setColor(new Color(255, 255, 255, 180));
-        g2d.fillOval(bx - 30, by + 10, 12, 4);
-        g2d.fillOval(bx + 20, by + 15, 16, 5);
-
-        drawPrinceSitting(g2d, bx, by - 25);
-        drawFoxSitting(g2d, bx - 30, by - 20);
-    }
-*/
-    private void drawFlyingScene(Graphics2D g2d, double t) {
-        g2d.setColor(new Color(24, 68, 92));
-        g2d.fillRect(0, 0, WIDTH, HEIGHT);
-
-        int flyX = (int) (180 + t * 220);
-        int flyY = (int) (400 - Math.sin(t * Math.PI) * 100);
-
-        int holdX = flyX + 16;
-        int holdY = flyY - 26;
-
-        int numBirds = 6;
-        for (int i = 0; i < numBirds; i++) {
-            int birdX = flyX - 120 + i * 45;
-            int birdY = flyY - 240 + (int) (Math.sin(globalTime * 2 + i) * 12);
-
-            g2d.setColor(new Color(210, 225, 230, 180));
-            g2d.setStroke(new BasicStroke(1.2f));
-            g2d.drawLine(birdX, birdY, holdX, holdY);
-
-            double wingFlap = Math.sin(globalTime * 3.5 + i * 0.6);
-            drawProportionalFlappingBird(g2d, birdX, birdY, wingFlap);
-        }
-
-        drawPrinceStandingFlight(g2d, flyX, flyY, holdX, holdY);
+    private void drawStarGlow(Graphics2D g2d, int cx, int cy, int size) {
+        g2d.setColor(new Color(255, 255, 220, 200));
+        g2d.drawLine(cx - size, cy, cx + size, cy);
+        g2d.drawLine(cx, cy - size, cx, cy + size);
+        g2d.setColor(Color.WHITE);
+        g2d.fillOval(cx - 2, cy - 2, 4, 4);
     }
 
     private void drawProportionalFlappingBird(Graphics2D g2d, int x, int y, double flap) {
@@ -476,107 +626,10 @@ public class LittlePrinceSmoothStory extends JPanel implements ActionListener {
         g2d.fill(wingFront);
     }
 
-    private void drawPrinceStandingFlight(Graphics2D g2d, int x, int y, int holdX, int holdY) {
-        g2d.setColor(new Color(110, 70, 45));
-        g2d.fillOval(x - 6, y + 26, 11, 7);
-        g2d.fillOval(x + 2, y + 26, 11, 7);
-
-        g2d.setColor(new Color(160, 205, 95));
-        g2d.fillRoundRect(x - 5, y + 16, 7, 13, 6, 6);
-        g2d.fillRoundRect(x + 3, y + 16, 7, 13, 6, 6);
-
-        g2d.fillRoundRect(x - 8, y + 2, 22, 18, 14, 14);
-
-        g2d.setColor(new Color(210, 50, 55));
-        g2d.fillRect(x - 8, y + 7, 22, 3);
-
-        g2d.setColor(new Color(160, 205, 95));
-        g2d.setStroke(new BasicStroke(6.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        g2d.drawLine(x + 5, y + 4, holdX, holdY);
-
-        g2d.setColor(new Color(255, 228, 208));
-        g2d.fillOval(holdX - 3, holdY - 3, 6, 6);
-
-        g2d.setColor(new Color(255, 228, 208));
-        g2d.fillOval(x - 2, y - 6, 10, 10);
-
-        g2d.fillOval(x - 12, y - 26, 28, 24);
-
-        g2d.setColor(new Color(245, 215, 95));
-        g2d.fillOval(x - 14, y - 31, 32, 20);
-        g2d.fillOval(x - 12, y - 34, 18, 14);
-        g2d.fillOval(x + 2, y - 32, 14, 12);
-        g2d.fillOval(x + 10, y - 22, 8, 12);
-
-        g2d.setColor(new Color(45, 40, 40));
-        g2d.fillOval(x + 8, y - 14, 4, 4);
-        g2d.setStroke(new BasicStroke(1.2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        g2d.drawArc(x + 7, y - 11, 6, 4, 200, 140);
-
-        g2d.setColor(new Color(245, 160, 160, 140));
-        g2d.fillOval(x + 10, y - 11, 5, 4);
-
-        g2d.setColor(new Color(215, 45, 50));
-        g2d.fillRoundRect(x - 10, y - 4, 24, 8, 6, 6);
-
-        double wave1 = Math.sin(globalTime * 4) * 6;
-        double wave2 = Math.cos(globalTime * 4) * 8;
-
-        GeneralPath scarf = new GeneralPath();
-        scarf.moveTo(x - 8, y - 2);
-        scarf.curveTo(x - 35, y - 2 + wave1, x - 70, y - 10 + wave2, x - 105, y - 6 + wave1);
-        scarf.lineTo(x - 105, y + 2 + wave1);
-        scarf.curveTo(x - 70, y + 2 + wave2, x - 35, y + 5 + wave1, x - 8, y + 4);
-        scarf.closePath();
-        g2d.fill(scarf);
-
-        g2d.setColor(new Color(245, 200, 50));
-        drawMiniStar(g2d, (int) (x - 98), (int) (y - 2 + wave1), 3);
-
-        int foxOnHeadX = x - 12;
-        int foxOnHeadY = y - 22;
-        
-        g2d.setColor(new Color(235, 165, 85));
-        g2d.fillOval(foxOnHeadX - 6, foxOnHeadY - 4, 15, 13);
-        
-        g2d.setColor(new Color(100, 50, 25));
-        g2d.fillOval(foxOnHeadX - 3, foxOnHeadY - 11, 4, 8);
-        g2d.fillOval(foxOnHeadX + 5, foxOnHeadY - 11, 4, 8);
-
-        g2d.setColor(new Color(250, 245, 235));
-        g2d.fillOval(foxOnHeadX - 3, foxOnHeadY + 1, 10, 7);
-
-        g2d.setColor(new Color(40, 35, 35));
-        g2d.fillOval(foxOnHeadX - 2, foxOnHeadY + 2, 2, 3);
-        g2d.fillOval(foxOnHeadX + 4, foxOnHeadY + 2, 2, 3);
-    }
-
-    private void drawRoseAndClosingBook(Graphics2D g2d, double t) {
-        if (t < 0.6) {
-            g2d.setColor(new Color(18, 22, 45));
-            g2d.fillRect(0, 0, WIDTH, HEIGHT);
-
-            drawGradientCraterPlanet(g2d, 300, 650, 360, 220);
-
-            int rx = 300;
-            int ry = 360;
-
-            drawDetailedRoseWithDome(g2d, rx, ry);
-
-            drawPrinceSitting(g2d, rx - 100, ry + 75);
-            drawFoxSitting(g2d, rx + 80, ry + 70);
-        } else {
-            double closeT = (t - 0.6) / 0.4;
-            g2d.setColor(new Color(25, 35, 60));
-            g2d.fillRect(0, 0, WIDTH, HEIGHT);
-
-            drawBookOpening(g2d, 1.0 - closeT);
-        }
-    }
-
     private void drawDetailedRoseWithDome(Graphics2D g2d, int cx, int cy) {
         int baseY = cy + 65;
 
+        // วาดฐานของครอบแก้ว
         g2d.setColor(new Color(100, 65, 40));
         g2d.fillOval(cx - 55, baseY + 4, 110, 22);
         g2d.setColor(new Color(140, 95, 55));
@@ -584,6 +637,7 @@ public class LittlePrinceSmoothStory extends JPanel implements ActionListener {
         g2d.setColor(new Color(80, 50, 30));
         g2d.drawOval(cx - 50, baseY, 100, 18);
 
+        // ก้านกุหลาบและใบ
         g2d.setColor(new Color(65, 115, 60));
         g2d.setStroke(new BasicStroke(4.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         
@@ -606,6 +660,7 @@ public class LittlePrinceSmoothStory extends JPanel implements ActionListener {
         leafRight.curveTo(cx + 18, cy + 10, cx + 25, cy + 18, cx + 3, cy + 25);
         g2d.fill(leafRight);
 
+        // กลีบเลี้ยงและดอกกุหลาบ
         g2d.setColor(new Color(50, 95, 45));
         int[] sepalX = {cx - 10, cx - 4, cx, cx + 4, cx + 10};
         int[] sepalY = {cy - 4, cy + 4, cy - 2, cy + 4, cy - 4};
@@ -633,6 +688,7 @@ public class LittlePrinceSmoothStory extends JPanel implements ActionListener {
         g2d.drawArc(cx - 6, cy - 20, 12, 8, 30, 220);
         g2d.drawArc(cx - 4, cy - 18, 8, 5, 200, 200);
 
+        // ตัวครอบแก้ว (Glass Dome)
         int domeW = 86;
         int domeH = 110;
         int domeX = cx - domeW / 2;
@@ -645,71 +701,11 @@ public class LittlePrinceSmoothStory extends JPanel implements ActionListener {
         g2d.setStroke(new BasicStroke(2.0f));
         g2d.drawRoundRect(domeX, domeY, domeW, domeH, domeW, domeW);
 
+        // แสงสะท้อนบนแก้ว
         g2d.setColor(new Color(255, 255, 255, 140));
         g2d.setStroke(new BasicStroke(3.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         g2d.drawArc(domeX + 8, domeY + 10, 25, 70, 100, 75);
         g2d.drawArc(domeX + 14, domeY + 16, 15, 30, 110, 60);
-    }
-
-    private void drawPrinceSitting(Graphics2D g2d, int x, int y) {
-        g2d.setColor(new Color(110, 70, 45));
-        g2d.fillOval(x - 12, y + 25, 11, 7);
-        g2d.fillOval(x + 1, y + 25, 11, 7);
-
-        g2d.setColor(new Color(160, 205, 95));
-        g2d.fillRoundRect(x - 13, y + 5, 26, 23, 16, 16);
-
-        g2d.setColor(new Color(210, 50, 55));
-        g2d.fillRect(x - 13, y + 10, 26, 4);
-
-        g2d.setColor(Color.WHITE);
-        g2d.fillOval(x - 2, y + 1, 4, 4);
-        g2d.fillOval(x - 2, y + 5, 4, 4);
-
-        g2d.setColor(new Color(255, 228, 208));
-        g2d.fillOval(x - 6, y - 6, 12, 10);
-
-        g2d.setColor(new Color(255, 228, 208));
-        g2d.fillOval(x - 16, y - 28, 32, 28);
-
-        g2d.setColor(new Color(245, 215, 95));
-        g2d.fillOval(x - 18, y - 33, 36, 22);
-        g2d.fillOval(x - 14, y - 36, 20, 16);
-        g2d.fillOval(x - 2, y - 35, 18, 14);
-        g2d.fillOval(x - 19, y - 25, 10, 15);
-        g2d.fillOval(x + 9, y - 25, 10, 15);
-
-        g2d.setColor(new Color(255, 228, 208));
-        g2d.fillOval(x - 18, y - 17, 5, 7);
-        g2d.fillOval(x + 13, y - 17, 5, 7);
-
-        g2d.setColor(new Color(45, 40, 40));
-        g2d.fillOval(x - 8, y - 15, 4, 4);
-        g2d.fillOval(x + 4, y - 15, 4, 4);
-
-        g2d.setStroke(new BasicStroke(1.2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        g2d.drawArc(x - 4, y - 12, 8, 5, 200, 140);
-
-        g2d.setColor(new Color(245, 160, 160, 140));
-        g2d.fillOval(x - 13, y - 12, 6, 4);
-        g2d.fillOval(x + 7, y - 12, 6, 4);
-
-        g2d.setColor(new Color(215, 45, 50));
-        g2d.fillRoundRect(x - 14, y - 5, 28, 9, 8, 8);
-
-        double scarfWave1 = Math.sin(globalTime * 3.5) * 8;
-        double scarfWave2 = Math.cos(globalTime * 3.5) * 12;
-
-        GeneralPath scarfTail = new GeneralPath();
-        scarfTail.moveTo(x - 10, y - 2);
-        scarfTail.curveTo(x - 25, y - 2 + scarfWave1, x - 45, y + scarfWave2, x - 65, y - 5 + scarfWave1);
-        scarfTail.lineTo(x - 63, y + 4 + scarfWave1);
-        scarfTail.curveTo(x - 45, y + 8 + scarfWave2, x - 25, y + 6 + scarfWave1, x - 10, y + 6);
-        scarfTail.closePath();
-        g2d.fill(scarfTail);
-
-        g2d.setColor(new Color(245, 200, 50));
-        drawMiniStar(g2d, (int) (x - 58), (int) (y - 1 + scarfWave1), 3);
     }
 
     private void drawMiniStar(Graphics2D g2d, int cx, int cy, int r) {
@@ -725,59 +721,257 @@ public class LittlePrinceSmoothStory extends JPanel implements ActionListener {
         g2d.fill(star);
     }
 
-    private void drawFoxSitting(Graphics2D g2d, int x, int y) {
-        g2d.setColor(new Color(110, 60, 30));
-        g2d.fillOval(x - 9, y + 22, 7, 5);
-        g2d.fillOval(x + 2, y + 22, 7, 5);
+    // ==========================================
+    // เมธอดวาดโมเดลตัวละคร (CHARACTER MODELS)
+    // ==========================================
+    
+    // วาดเจ้าชายน้อยท่านั่ง
+    private void drawPrinceSitting(Graphics2D g2d, int x, int y) {
+        // รองเท้า
+        g2d.setColor(new Color(110, 70, 45));
+        g2d.fillOval(x - 15, y + 30, 14, 9);
+        g2d.fillOval(x + 1, y + 30, 14, 9);
 
+        // ตัว/ชุดสีเขียว
+        g2d.setColor(new Color(160, 205, 95));
+        g2d.fillRoundRect(x - 16, y + 6, 32, 28, 18, 18);
+
+        // เข็มขัดสีแดง
+        g2d.setColor(new Color(210, 50, 55));
+        g2d.fillRect(x - 16, y + 12, 32, 5);
+
+        // กระดุมชุด
+        g2d.setColor(Color.WHITE);
+        g2d.fillOval(x - 2, y + 1, 5, 5);
+        g2d.fillOval(x - 2, y + 6, 5, 5);
+
+        // คอ
+        g2d.setColor(new Color(255, 228, 208));
+        g2d.fillOval(x - 7, y - 7, 14, 12);
+
+        // ศีรษะ
+        g2d.setColor(new Color(255, 228, 208));
+        g2d.fillOval(x - 20, y - 34, 40, 35);
+
+        // ผมทรงเจ้าชาย
+        g2d.setColor(new Color(245, 215, 95));
+        g2d.fillOval(x - 22, y - 40, 44, 27);
+        g2d.fillOval(x - 17, y - 44, 25, 20);
+        g2d.fillOval(x - 2, y - 43, 22, 17);
+        g2d.fillOval(x - 23, y - 30, 12, 18);
+        g2d.fillOval(x + 11, y - 30, 12, 18);
+
+        // หู
+        g2d.setColor(new Color(255, 228, 208));
+        g2d.fillOval(x - 22, y - 21, 6, 8);
+        g2d.fillOval(x + 16, y - 21, 6, 8);
+
+        // ตาและรอยยิ้ม
+        g2d.setColor(new Color(45, 40, 40));
+        g2d.fillOval(x - 10, y - 18, 5, 5);
+        g2d.fillOval(x + 5, y - 18, 5, 5);
+
+        g2d.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2d.drawArc(x - 5, y - 14, 10, 6, 200, 140);
+
+        // แก้มอมชมพู
+        g2d.setColor(new Color(245, 160, 160, 140));
+        g2d.fillOval(x - 16, y - 14, 7, 5);
+        g2d.fillOval(x + 9, y - 14, 7, 5);
+
+        // ปกคอเสื้อ
+        g2d.setColor(new Color(215, 45, 50));
+        g2d.fillRoundRect(x - 17, y - 6, 34, 11, 10, 10);
+
+        // ผ้าพันคอพริ้วไหว
+        double scarfWave1 = Math.sin(globalTime * 3.5) * 8;
+        double scarfWave2 = Math.cos(globalTime * 3.5) * 12;
+
+        GeneralPath scarfTail = new GeneralPath();
+        scarfTail.moveTo(x - 12, y - 2);
+        scarfTail.curveTo(x - 30, y - 2 + scarfWave1, x - 55, y + scarfWave2, x - 78, y - 5 + scarfWave1);
+        scarfTail.lineTo(x - 75, y + 5 + scarfWave1);
+        scarfTail.curveTo(x - 55, y + 10 + scarfWave2, x - 30, y + 8 + scarfWave1, x - 12, y + 8);
+        scarfTail.closePath();
+        g2d.fill(scarfTail);
+
+        g2d.setColor(new Color(245, 200, 50));
+        drawMiniStar(g2d, (int) (x - 70), (int) (y - 1 + scarfWave1), 4);
+    }
+
+    // วาดเจ้าชายน้อยท่ายืนบิน
+    private void drawPrinceStandingFlight(Graphics2D g2d, int x, int y, int holdX, int holdY) {
+        // รองเท้า
+        g2d.setColor(new Color(110, 70, 45));
+        g2d.fillOval(x - 7, y + 31, 13, 8);
+        g2d.fillOval(x + 2, y + 31, 13, 8);
+
+        // ขาและลำตัว
+        g2d.setColor(new Color(160, 205, 95));
+        g2d.fillRoundRect(x - 6, y + 19, 8, 15, 7, 7);
+        g2d.fillRoundRect(x + 3, y + 19, 8, 15, 7, 7);
+
+        g2d.fillRoundRect(x - 10, y + 2, 26, 22, 16, 16);
+
+        // เข็มขัด
+        g2d.setColor(new Color(210, 50, 55));
+        g2d.fillRect(x - 10, y + 8, 26, 4);
+
+        // แขนเอื้อมจับเชือก
+        g2d.setColor(new Color(160, 205, 95));
+        g2d.setStroke(new BasicStroke(7.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2d.drawLine(x + 6, y + 4, holdX, holdY);
+
+        g2d.setColor(new Color(255, 228, 208));
+        g2d.fillOval(holdX - 4, holdY - 4, 8, 8);
+
+        // คอและศีรษะ
+        g2d.setColor(new Color(255, 228, 208));
+        g2d.fillOval(x - 2, y - 7, 12, 12);
+        g2d.fillOval(x - 15, y - 31, 34, 29);
+
+        // ผม
+        g2d.setColor(new Color(245, 215, 95));
+        g2d.fillOval(x - 17, y - 37, 38, 24);
+        g2d.fillOval(x - 15, y - 41, 22, 17);
+        g2d.fillOval(x + 2, y - 38, 17, 14);
+        g2d.fillOval(x + 12, y - 26, 10, 14);
+
+        // หน้าตา
+        g2d.setColor(new Color(45, 40, 40));
+        g2d.fillOval(x + 9, y - 17, 5, 5);
+        g2d.setStroke(new BasicStroke(1.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2d.drawArc(x + 8, y - 13, 7, 5, 200, 140);
+
+        g2d.setColor(new Color(245, 160, 160, 140));
+        g2d.fillOval(x + 12, y - 13, 6, 5);
+
+        // ปกคอเสื้อ
+        g2d.setColor(new Color(215, 45, 50));
+        g2d.fillRoundRect(x - 12, y - 5, 28, 9, 7, 7);
+
+        // ผ้าพันคอ
+        double wave1 = Math.sin(globalTime * 4) * 6;
+        double wave2 = Math.cos(globalTime * 4) * 8;
+
+        GeneralPath scarf = new GeneralPath();
+        scarf.moveTo(x - 10, y - 2);
+        scarf.curveTo(x - 40, y - 2 + wave1, x - 80, y - 10 + wave2, x - 120, y - 6 + wave1);
+        scarf.lineTo(x - 120, y + 3 + wave1);
+        scarf.curveTo(x - 80, y + 3 + wave2, x - 40, y + 6 + wave1, x - 10, y + 5);
+        scarf.closePath();
+        g2d.fill(scarf);
+
+        g2d.setColor(new Color(245, 200, 50));
+        drawMiniStar(g2d, (int) (x - 112), (int) (y - 2 + wave1), 4);
+
+        // ตัวจิ้งจอกจิ๋วบนหัวเจ้าชาย
+        int foxOnHeadX = x - 14;
+        int foxOnHeadY = y - 26;
+        
         g2d.setColor(new Color(235, 165, 85));
-        g2d.fillOval(x - 12, y + 6, 24, 20);
+        g2d.fillOval(foxOnHeadX - 7, foxOnHeadY - 5, 18, 15);
+        
+        g2d.setColor(new Color(100, 50, 25));
+        g2d.fillOval(foxOnHeadX - 4, foxOnHeadY - 13, 5, 10);
+        g2d.fillOval(foxOnHeadX + 6, foxOnHeadY - 13, 5, 10);
 
         g2d.setColor(new Color(250, 245, 235));
-        g2d.fillOval(x - 7, y + 8, 14, 16);
+        g2d.fillOval(foxOnHeadX - 4, foxOnHeadY + 1, 12, 8);
 
-        g2d.setColor(new Color(210, 130, 50));
-        g2d.fillOval(x - 12, y + 8, 5, 9);
-        g2d.fillOval(x + 7, y + 8, 5, 9);
+        g2d.setColor(new Color(40, 35, 35));
+        g2d.fillOval(foxOnHeadX - 2, foxOnHeadY + 2, 3, 4);
+        g2d.fillOval(foxOnHeadX + 5, foxOnHeadY + 2, 3, 4);
+    }
 
-        g2d.setColor(new Color(100, 50, 25));
-        int[] earX1 = {x - 14, x - 8, x - 2};
-        int[] earY1 = {y - 4, y - 22, y - 4};
+    // วาดสุนัขจิ้งจอกท่านั่ง
+    private void drawFoxSitting(Graphics2D g2d, int x, int y) {
+        double tailSway = Math.sin(globalTime * 2.5) * 6;
+        double tailSway2 = Math.cos(globalTime * 2.5) * 4;
+
+        // 1. หาง
+        GeneralPath tailBase = new GeneralPath();
+        tailBase.moveTo(x + 8, y + 22);
+        tailBase.curveTo(x + 28, y + 25, x + 48 + tailSway, y + 10 + tailSway2, x + 42 + tailSway, y - 18);
+        tailBase.curveTo(x + 26 + tailSway, y - 28, x + 15, y + 2, x + 2, y + 16);
+        tailBase.closePath();
+        g2d.setColor(new Color(225, 125, 50));
+        g2d.fill(tailBase);
+
+        GeneralPath tailTip = new GeneralPath();
+        tailTip.moveTo(x + 42 + tailSway, y - 18);
+        tailTip.curveTo(x + 46 + tailSway, y - 8 + tailSway2, x + 34 + tailSway, y - 2, x + 26 + tailSway, y - 8);
+        tailTip.curveTo(x + 25 + tailSway, y - 22, x + 34 + tailSway, y - 30, x + 42 + tailSway, y - 18);
+        tailTip.closePath();
+        g2d.setColor(new Color(252, 250, 245));
+        g2d.fill(tailTip);
+
+        // 2. ขาหลังและลำตัว
+        g2d.setColor(new Color(210, 110, 40));
+        g2d.fillOval(x + 2, y + 12, 16, 18);
+
+        g2d.setColor(new Color(225, 125, 50));
+        g2d.fillOval(x - 12, y + 6, 26, 24);
+
+        g2d.setColor(new Color(252, 250, 245));
+        g2d.fillOval(x - 10, y + 4, 16, 22);
+
+        // 3. ขาหน้า
+        g2d.setColor(new Color(60, 40, 35));
+        g2d.fillRoundRect(x - 8, y + 16, 5, 16, 4, 4);
+        g2d.fillRoundRect(x + 1, y + 16, 5, 16, 4, 4);
+
+        // 4. หู
+        int[] earX1 = {x - 16, x - 11, x - 2};
+        int[] earY1 = {y - 4, y - 32, y - 4};
+        g2d.setColor(new Color(40, 30, 30));
         g2d.fillPolygon(earX1, earY1, 3);
-
-        int[] earX2 = {x + 2, x + 8, x + 14};
-        int[] earY2 = {y - 4, y - 22, y - 4};
-        g2d.fillPolygon(earX2, earY2, 3);
-
-        g2d.setColor(new Color(235, 165, 85));
-        int[] innerEarX1 = {x - 12, x - 8, x - 4};
-        int[] innerEarY1 = {y - 4, y - 17, y - 4};
+        int[] innerEarX1 = {x - 14, x - 11, x - 4};
+        int[] innerEarY1 = {y - 4, y - 27, y - 4};
+        g2d.setColor(new Color(252, 250, 245));
         g2d.fillPolygon(innerEarX1, innerEarY1, 3);
 
-        int[] innerEarX2 = {x + 4, x + 8, x + 12};
-        int[] innerEarY2 = {y - 4, y - 17, y - 4};
+        int[] earX2 = {x + 2, x + 11, x + 16};
+        int[] earY2 = {y - 4, y - 32, y - 4};
+        g2d.setColor(new Color(40, 30, 30));
+        g2d.fillPolygon(earX2, earY2, 3);
+        int[] innerEarX2 = {x + 4, x + 11, x + 14};
+        int[] innerEarY2 = {y - 4, y - 27, y - 4};
+        g2d.setColor(new Color(252, 250, 245));
         g2d.fillPolygon(innerEarX2, innerEarY2, 3);
 
-        g2d.setColor(new Color(235, 165, 85));
+        // 5. ศีรษะและใบหน้า
+        g2d.setColor(new Color(225, 125, 50));
         GeneralPath head = new GeneralPath();
-        head.moveTo(x, y - 18);
-        head.curveTo(x + 18, y - 12, x + 22, y + 2, x, y + 8);
-        head.curveTo(x - 22, y + 2, x - 18, y - 12, x, y - 18);
+        head.moveTo(x - 15, y - 10);
+        head.curveTo(x - 18, y - 2, x - 10, y + 6, x, y + 8);
+        head.curveTo(x + 10, y + 6, x + 18, y - 2, x + 15, y - 10);
+        head.curveTo(x + 8, y - 22, x - 8, y - 22, x - 15, y - 10);
         head.closePath();
         g2d.fill(head);
 
-        g2d.setColor(new Color(250, 245, 235));
-        g2d.fillOval(x - 8, y - 5, 16, 11);
+        g2d.setColor(new Color(252, 250, 245));
+        GeneralPath muzzle = new GeneralPath();
+        muzzle.moveTo(x - 14, y - 2);
+        muzzle.curveTo(x - 8, y + 6, x, y + 8, x + 8, y + 6);
+        muzzle.curveTo(x + 14, y - 2, x, y - 2, x - 14, y - 2);
+        muzzle.closePath();
+        g2d.fill(muzzle);
 
-        g2d.setColor(new Color(40, 35, 35));
-        g2d.fillOval(x - 11, y - 4, 3, 4);
-        g2d.fillOval(x + 8, y - 4, 3, 4);
-        g2d.fillOval(x - 2, y - 4, 4, 3);
+        // 6. หน้าตาจิ้งจอก
+        g2d.setColor(new Color(40, 30, 30));
+        g2d.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2d.drawArc(x - 10, y - 5, 6, 5, 20, 140);
+        g2d.drawArc(x + 4, y - 5, 6, 5, 20, 140);
+
+        g2d.fillOval(x - 3, y + 3, 6, 4);
     }
-
+    // ==========================================
+    // MAIN METHOD (จุดเริ่มต้นการรันโปรแกรม)
+    // ==========================================
     public static void main(String[] args) {
-        JFrame frame = new JFrame("The Little Prince - Flower Meadow Scene");
-        LittlePrinceSmoothStory anim = new LittlePrinceSmoothStory();
+        JFrame frame = new JFrame("The Little Prince - Smooth Story");
+        LittlePrince anim = new LittlePrince();
         frame.add(anim);
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
